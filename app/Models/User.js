@@ -34,6 +34,22 @@ class User extends Model {
   tokens () {
     return this.hasMany('App/Models/Token')
   }
+
+  emails(){
+    return this.hasMany('App/Models/Email')
+  }
+
+  phones(){
+    return this.hasMany('App/Models/Phone')
+  }
+
+  contacts(){
+    return this.belongsToMany("App/Models/User", "user_id", "contact_id", "id", "id").pivotTable("contacts")
+  }
+
+  userContacts(){
+    return this.belongsToMany("App/Models/User", "contact_id", "user_id", "id", "id").pivotTable("contacts")
+  }
 }
 
 module.exports = User

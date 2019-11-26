@@ -16,6 +16,10 @@
 /** @type {typeof import('@adonisjs/framework/src/Route/Manager')} */
 const Route = use('Route')
 
-Route.get('/', () => {
-  return { greeting: 'Hello world in JSON' }
-})
+_requireRoutes('User').prefix('api/user')
+_requireRoutes('Email').prefix('api/email')
+_requireRoutes('Phone').prefix('api/phone')
+
+function _requireRoutes(group) {
+  return require(`../app/Routes/${group}`)
+}
