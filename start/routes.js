@@ -19,6 +19,7 @@ const Route = use('Route')
 _requireRoutes('User').prefix('api/user')
 _requireRoutes('Email').prefix('api/email')
 _requireRoutes('Phone').prefix('api/phone')
+_requireRoutes('Auth').prefix('api/auth')
 
 function _requireRoutes(group) {
   return require(`../app/Routes/${group}`)

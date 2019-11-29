@@ -111,14 +111,13 @@ class UserController {
         if(validation.fails()) return response.badRequest(validation.messages())
 
         if(allParams.ids.length > 1){
-            const users = await User
+            await User
             .query()
             .whereIn('id', allParams.ids)
             .delete()
         }else if(allParams.ids.length == 1){
-            response.ok({user})
-
-            const user = await User.find(allParams.ids).delete()
+            const user = await User.findOrFail(allParams.ids)
+            await user.delete()
         }else{
             response.notFound()
         }

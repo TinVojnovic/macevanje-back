@@ -12,5 +12,4 @@ module.exports = Route.group(() => {
     Route.put('update/:id', 'UserController.update')
 
     Route.delete('delete', 'UserController.delete')
-
 })
