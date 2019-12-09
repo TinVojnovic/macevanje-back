@@ -9,11 +9,11 @@ class EmailController {
         const user = await User.findOrFail(params.id)
 
         const allParams = sanitize(request.post(), {
-            email: 'normalize_email'
+            mail: 'normalize_email'
         })
 
         const validation = await validate(allParams, {
-            email: 'required|email|unique:users,email',
+            mail: 'required|email|unique:users,email',
             is_main: 'boolean'
         })
         if (validation.fails()) return response.badRequest(validation.messages())
@@ -21,7 +21,7 @@ class EmailController {
         const current_main = await user.emails().where('is_main', true).first()
 
         const email = await user.emails().create({
-            mail: allParams.email
+            mail: allParams.mail
         })
 
         if (allParams.is_main != null) {
@@ -48,11 +48,11 @@ class EmailController {
 
     async update({request, response, params}){
         const allParams = sanitize(request.post(), {
-            email: 'normalize_email'
+            mail: 'normalize_email'
         })
 
         const validation = await validate(allParams, {
-            email: 'email|unique:users,email',
+            mail: 'email|unique:users,email',
             is_main: 'boolean'
         })
 
@@ -62,20 +62,21 @@ class EmailController {
         const user = await User.findOrFail(email.user_id)
         const current_main = await user.emails().where('is_main', true).first()
 
-        if(allParams.email){
+        if(allParams.mail){
             email.merge({
-                mail: allParams.email
+                mail: allParams.mail
             })
             await email.save()
+            if(email.is_main){
+                user.merge({
+                    email: allParams.mail
+                })
+                await user.save()
+            }
         }
 
         if(allParams.is_main != null){
             if(allParams.is_main && !email.is_main){
-                user.merge({
-                    email: email.mail
-                })
-                await user.save()
-
                 current_main.merge({
                     is_main: false
                 })
