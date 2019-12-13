@@ -50,6 +50,10 @@ class User extends Model {
   userContacts(){
     return this.belongsToMany("App/Models/User", "contact_id", "user_id", "id", "id").pivotTable("contacts")
   }
+
+  payments(){
+    return this.hasMany("App/Models/Membership")
+  }
 }
 
 module.exports = User

@@ -20,6 +20,7 @@ _requireRoutes('User').prefix('api/user')
 _requireRoutes('Email').prefix('api/email')
 _requireRoutes('Phone').prefix('api/phone')
 _requireRoutes('Auth').prefix('api/auth')
+_requireRoutes('Membership').prefix('api/membership')
 
 function _requireRoutes(group) {
   return require(`../app/Routes/${group}`)
