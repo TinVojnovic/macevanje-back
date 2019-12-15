@@ -2,6 +2,7 @@
 
 const User = use("App/Models/User")
 const { validate, sanitize } = use('Validator')
+let _ = require('lodash');
 
 class UserController {
     async create({ request, response }) {
@@ -20,6 +21,10 @@ class UserController {
         })
 
         if (validation.fails()) return response.badRequest(validation.messages())
+
+        if (allParams.type == "admin") {
+            return response.badRequest(validation.messages("You must create an admin through registration"))
+        }
 
         const user = await User.create({
             name: allParams.name,
@@ -89,36 +94,49 @@ class UserController {
 
         await user.save()
 
+        if (user.type === "contact") {
+            if (allParams.userIds) {
+                const contacts = user.userContacts().fetch()
+                const ids = _.map(contacts, contact => {
+                    return contact.$relations.pivot.id
+                })
+                console.log(ids)
+                //const params = _.difference(allParams.userIds, ids)
+                //await user.userContacts().detach(ids)
+                //await user.userContacts().attach(allParams.userIds)
+            }
+        }
+
         if (allParams.email) {
             const email = await user.emails().where('is_main', true).first()
             email.merge({
                 mail: allParams.email
             })
             await email.save()
-            response.ok({email})
+            response.ok({ email })
         }
 
-        response.ok({user})
+        response.ok({ user })
     }
 
-    async delete({request, response}){
+    async delete({ request, response }) {
         const allParams = request.post()
         const validation = await validate(allParams, {
             ids: 'required|array',
             'ids.*': 'integer'
         })
 
-        if(validation.fails()) return response.badRequest(validation.messages())
+        if (validation.fails()) return response.badRequest(validation.messages())
 
-        if(allParams.ids.length > 1){
+        if (allParams.ids.length > 1) {
             await User
-            .query()
-            .whereIn('id', allParams.ids)
-            .delete()
-        }else if(allParams.ids.length == 1){
+                .query()
+                .whereIn('id', allParams.ids)
+                .delete()
+        } else if (allParams.ids.length == 1) {
             const user = await User.findOrFail(allParams.ids)
             await user.delete()
-        }else{
+        } else {
             response.notFound()
         }
     }
